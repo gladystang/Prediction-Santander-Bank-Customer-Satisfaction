@@ -1,0 +1,294 @@
+###################################################PCA
+#first apply a Box-Cox transformation to correct for skewness, 
+#center and scale each variable and then apply PCA in one call 
+#to the preProcess function of the caret package.
+#http://www.inside-r.org/node/86978
+library(caret)
+data1= preProcess(all[,2:309], thresh = 0.95,
+                   method=c("BoxCox", "center", 
+                            "scale", "pca"))
+PC = predict(data1, all[,2:309])
+
+write.csv(PC, "PCA.csv", row.names = FALSE)
+
+###################################################LASSO  
+library(glmnet)
+train <- as.matrix(train)
+train.strip <- as.matrix(train.strip)
+cv.lasso.obj <- cv.glmnet(train.strip, TARGET, alpha = 1)
+lasso.lambda.min <- cv.lasso.obj$lambda.min
+lasso.lambda.1se <- cv.lasso.obj$lambda.1se
+
+obj <- glmnet(train.strip, TARGET, alpha = 1)
+plot(obj, xvar = "lambda", label = T)
+beta <- obj$beta[,which(obj$lambda == lasso.lambda.min)]
+beta <- beta[beta != 0]
+lasso.columns <- names(beta)
+###################################################LDA
+
+# pre-process the data
+library(caret)
+train2 <- preProcess(train1) # preprocess data
+
+train3 <- predict(train2, newdata = train1)
+
+# build the LDA model
+library(MASS)
+lda.model <- lda(x = as.matrix(train2), grouping = train$TARGET)
+
+lda.columns <- colnames(train1[,order(abs(lda.model$scaling), decreasing = T)])
+
+library(readr) # CSV file I/O, e.g. the read_csv function
+library(xgboost)
+# Reading the data
+train <- read.csv(file.choose(), stringsAsFactors = F) #76020  310
+test <- read.csv(file.choose(), stringsAsFactors = F) #75818
+all  <- rbind(train, test)
+
+#length(train$TARGET[train$TARGET==1])
+#[1] 3008
+#length(train$TARGET[train$TARGET==0])
+#[1] 73012
+#############################################method 1 to remove highly correlated variables
+#Removing highly correlated variables #0.840057
+cor_v<-abs(cor(all ))
+diag(cor_v)<-0
+cor_v[upper.tri(cor_v)] <- 0
+cor_f <- data.frame(which(cor_v > 0.85, arr.ind = T))
+all1 <- all[,-c(unique(cor_f$row),1,310)]
+
+
+# Splitting the data for model
+
+train_sub1 <- all1[1:nrow(train), ]
+test_sub1 <- all1[-(1:nrow(train)), ]
+write.csv(train_sub1,"E:/2016 spring course/502X/Kaggle contest/submission one dataset/train_sub1.csv",row.names = FALSE)
+write.csv(test_sub1,"E:/2016 spring course/502X/Kaggle contest/submission one dataset/test_sub1.csv",row.names = FALSE)
+###################################################method 2 PCA based on PCA
+#first apply a Box-Cox transformation to correct for skewness, 
+#center and scale each variable and then apply PCA in one call 
+#to the preProcess function of the caret package.
+#http://www.inside-r.org/node/86978
+library(caret)
+data1= preProcess(all[,2:309], thresh = 0.85,
+                  method=c("BoxCox", "center", 
+                           "scale", "pca"))
+PC = predict(data1, all[,2:309])  #0.819915
+
+write.csv(PC, "E:/2016 spring course/502X/Kaggle contest/submission one dataset/PCA85.csv", row.names = FALSE)
+train_sub3 <- PC[1:nrow(train), ]
+test_sub3 <- PC[-(1:nrow(train)), ]
+write.csv(train_sub3,"E:/2016 spring course/502X/Kaggle contest/submission one dataset/train_sub3.csv",row.names = FALSE)
+write.csv(test_sub3,"E:/2016 spring course/502X/Kaggle contest/submission one dataset/test_sub3.csv",row.names = FALSE)
+###############################################--------------------------------------------------------
+
+#------------------------------method 3 combine new feature and PCA 85%----------------
+#adding a new feature rowsums and rowsds to the dataset 
+ 
+library(matrixStats)
+x<-scale(all[,2:309])
+colnames(x)<-c(paste("V",1:308,sep=""))
+nv1<-x[,1]
+nv2<-rowSums(x[,3:9])
+nv3<-rowSds(x[,3:9])
+nv4<-rowSums(x[,10:19])
+nv5<-rowSds(x[,10:19]) 
+nv6<-rowSums(x[,20:67])
+nv7<-rowSds(x[,20:67])
+nv8<-rowSums(x[,68:79])
+nv9<-rowSds(x[,68:79]) 
+nv10<-rowSums(x[,80:85])
+nv11<-rowSds(x[,80:85])
+nv12<-rowSums(x[,86:97])
+nv13<-rowSds(x[,86:97]) 
+nv14<-rowSums(x[,98:107])
+nv15<-rowSds(x[,98:107])
+nv16<-rowSums(x[,108:128])
+nv17<-rowSds(x[,108:128]) 
+nv18<-rowSums(x[,129:153])
+nv19<-rowSds(x[,129:153])
+nv20<-rowSums(x[,155:168])
+nv21<-rowSds(x[,155:168]) 
+nv22<-rowSums(x[,169:175])
+nv23<-rowSds(x[,169:175])
+nv24<-rowSums(x[,176:182])
+nv25<-rowSds(x[,176:182]) 
+nv26<-rowSums(x[,183:190])
+nv27<-rowSds(x[,183:190])
+nv28<-rowSums(x[,191:199])
+nv29<-rowSds(x[,191:199]) 
+nv30<-rowSums(x[,200:207])
+nv31<-rowSds(x[,200:207])
+nv32<-rowSums(x[,209:215])
+nv33<-rowSds(x[,209:215]) 
+nv34<-rowSums(x[,216:219])
+nv35<-rowSds(x[,216:219])
+nv36<-rowSums(x[,220:236])
+nv37<-rowSds(x[,220:236]) 
+nv38<-rowSums(x[,237:248])
+nv39<-rowSds(x[,237:248])
+nv40<-rowSums(x[,249:252])
+nv41<-rowSds(x[,249:252]) 
+nv42<-rowSums(x[,253:268])
+nv43<-rowSds(x[,253:268]) 
+nv44<-rowSums(x[,269:307])
+nv45<-rowSds(x[,269:307])
+nv46<-x[,2]
+nv47<-x[,154]
+nv48<-x[,208]
+nv49<-x[,308]
+newdata <- cbind(nv1,nv2,nv3,nv4,nv5,nv6,nv7,nv8,nv9,nv10,nv11,nv12,nv13,nv14,nv15,nv16,nv17,nv18,
+                 nv19,nv20,nv21,nv22,nv23,nv24,nv25,nv26,nv27,nv28,nv29,nv30,nv31,nv32,nv33,nv34,
+                 nv35,nv36,nv37,nv38,nv39,nv40,nv41,nv42,nv43,nv44,nv45,nv46,nv47,nv48,nv49)
+
+
+PCAs<-read.csv(file.choose(),header=T)
+
+newdataset<-cbind(newdata,PCAs) #0.837365
+# Splitting the data for model
+
+train_sub2 <- newdataset[1:nrow(train), ]
+test_sub2 <- newdataset[-(1:nrow(train)), ]
+write.csv(train_sub2,"E:/2016 spring course/502X/Kaggle contest/submission one dataset/train_sub2.csv",row.names = FALSE)
+write.csv(test_sub2,"E:/2016 spring course/502X/Kaggle contest/submission one dataset/test_sub2.csv",row.names = FALSE)
+#------------------------------------------------------------------------------------
+####################method 4 correlation between target and the colums #0.838827   python result 0.839904
+cor_vtrain<-abs(cor(train[,2:309],train[,310]))
+all1<-all[,2:309]
+cor_data <- data.frame(all1[,which(cor_vtrain > 0.00447)]) 
+# Splitting the data for model
+
+train_sub4 <- cor_data[1:nrow(train), ]
+test_sub4 <- cor_data[-(1:nrow(train)), ]
+write.csv(train_sub4,"E:/2016 spring course/502X/Kaggle contest/submission one dataset/train_sub4.csv",row.names = FALSE)
+write.csv(test_sub4,"E:/2016 spring course/502X/Kaggle contest/submission one dataset/test_sub4.csv",row.names = FALSE)
+
+
+
+ 
+####################method 5 assign the outlier to a common value  PCA+new variable+same important variable
+all$var3[all$var3==-999999]<-2
+new_var3<-all$var3
+newdataset11<-cbind(newdataset,new_var3,all$var38,all$var15,all$saldo_var30,all$saldo_medio_var5_ult3,all$saldo_medio_var5_hace3,all$saldo_medio_var5_hace2,
+                  all$num_var45_ult3,all$saldo_medio_var5_ult1,all$num_var22_ult3,all$saldo_var5,all$saldo_var42)
+# 0.837283
+# Splitting the data for model
+train_sub5 <- newdataset[1:nrow(train), ]
+test_sub5 <- newdataset[-(1:nrow(train)), ]
+write.csv(train_sub5,"E:/2016 spring course/502X/Kaggle contest/submission one dataset/train_sub5.csv",row.names = FALSE)
+write.csv(test_sub5,"E:/2016 spring course/502X/Kaggle contest/submission one dataset/test_sub5.csv",row.names = FALSE) 
+
+
+#############--------------------------------------------------
+#resample the data
+set.seed(123) 
+subset1=subset(train,Cover_Type=="1") 
+index1 <- 1:nrow(subset1) 
+testindex1 <- sample(index1, trunc(length(index1)/3)) 
+testset1 <- subset1[testindex1,] trainset1<- subset1[-testindex1,] 
+subset2=subset(train,Cover_Type=="2") 
+index2 <- 1:nrow(subset2) 
+testindex2 <- sample(index2, trunc(length(index2)/3)) 
+testset2 <- subset2[testindex2,] trainset2 <- subset2[-testindex2,]
+
+
+#prediction part-----------------------------------------------------------------
+
+train1 <- read.csv(file.choose(), stringsAsFactors = F) #76020  310
+test1 <- read.csv(file.choose(), stringsAsFactors = F) #75818
+ 
+#Building the model
+set.seed(88)
+param <- list("objective" = "binary:logistic",booster = "gbtree",
+              "eval_metric" = "auc",colsample_bytree = 0.85, subsample = 0.95)
+
+y <- as.numeric(train$TARGET)
+
+#AUC was highest in 310th round during cross validation
+xgbmodel <- xgboost(data = as.matrix(train_sub5), params = param,
+                    nrounds = 310, max.depth = 5, eta = 0.03,
+                    label = y, maximize = T)
+
+#Prediction
+res <- predict(xgbmodel, newdata = data.matrix(test_sub5))
+res <- data.frame(ID = test$ID, TARGET = res)
+
+write.csv(res, "E:/2016 spring course/502X/Kaggle contest/submission_5.csv", row.names = FALSE)
+
+  
+
+
+
+
+
+ 
+
+ 
+
+p1 <- sum(train1[train1$V1 == -999999,"TARGET"])/length(train1[train1$V1 == -999999,"TARGET"])
+p0 <- sum(train1[train1$V1 != -999999,"TARGET"])/length(train1[train1$V1 != -999999,"TARGET"])
+train1$V1_prob <- ifelse(train1$V1 == -999999, p1, p0)
+test1$V1_prob <- ifelse(test1$V1 == -999999, p1, p0)
+
+train1$V1[which(train1$V1 == -999999)] <- 2
+
+
+
+# Code to look at correlated pairs 
+# pairs of columns
+feature.pairs <- combn(x = names(train), m = 2, simplify = F) #T gives matrix, F gives list
+#remove columns that are "absolutely correlated"
+correlated.pairs <- matrix(nrow = 2)
+for(pair in feature.pairs) {
+  f1 <- pair[1]
+  f2 <- pair[2]
+  if (abs(cor(train[[f1]] , train[[f2]])) == 1) {
+    cat(f1, "and", f2, "are very correlated \n")
+    correlated.pairs <- cbind(correlated.pairs, c(f1,f2))
+  }
+}
+correlated.pairs[1:2, 1:10]
+
+
+
+# Code for deep learning 
+train <- read.csv(file.choose(), stringsAsFactors = F) #76020   371
+test <- read.csv(file.choose(), stringsAsFactors = F) #75818   370
+
+simplexgbtest_v0 <- read.csv(file.choose(), stringsAsFactors = F)
+
+orderdata<-simplexgbtest_v0[order(simplexgbtest_v0$TARGET),]
+cases<-orderdata$ID[73000:75818]
+newcases<-subset(test,test$ID %in% cases)
+newcases$TARGET <- 1
+
+simplexgbtest_v2 <-read.csv(file.choose(), stringsAsFactors = F)
+simplexgbtest_v1 <- read.csv(file.choose(), stringsAsFactors = F)
+
+orderdata1<-simplexgbtest_v1[order(simplexgbtest_v1$TARGET),]
+cases1<-orderdata1$ID[73818:75818]
+newcases1<-subset(test,test$ID %in% cases1)
+newcases1$TARGET <- 1
+
+orderdata3<-simplexgbtest_v2[order(simplexgbtest_v2$TARGET),]
+cases3<-orderdata3$ID[73818:75818]
+newcases3<-subset(test,test$ID %in% cases3)
+newcases3$TARGET <- 1
+ 
+
+ train11<-rbind(train,newcases)
+ train22<-rbind(train,newcases1)
+train333<-rbind(train,newcases3)
+train334<-train333
+
+ write.csv(train33,"E:/2016 spring course/502X/Kaggle contest/train_33.csv" )
+
+ write.csv(train22,"E:/2016 spring course/502X/Kaggle contest/train_v01.csv" )
+
+  
+
+
+
+
+
+
