@@ -1,1 +1,7 @@
 # Prediction-Santander-Bank-Customer-Satisfaction
+
+This is to make predicitons about customer satisfaction, basically speaking the predicitons are probabilities and use some threshold to 
+make predictions.
+
+
+This past week we made a submission that increased our current score to 0.840914. The script that brought us to this score was found on the forum, and gave us ideas on feature creation. The code created 4 different features; one indicated if variable 38 was above the most common value, the second indicated if variable 38 was at the most common value, the third indicated if variable 38 was below the most common value, and the fourth summed up the number of zeros in each rows (high values are associated with more satisfied customers). We also have made a few submissions using Python. Our theory is that Python is more efficient when using xgboost. A few of our submissions were made with likelihood ratio features. What we have planned for this upcoming week is doing more feature creation. We wish to pick out the most significant likelihood ratio and conditional probability variables using logistic regression. We also plan on seeing if any two way interactions would be a significant addition to our model. Lastly, we want to try out different predictive methods such as logit boosting, adaboosting, SVM, and logistic regression. Our hope to use ensemble our output into a final model soon.
